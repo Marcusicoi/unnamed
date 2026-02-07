@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="https://marcusicoi.glitch.me/icon.png" />
+
+    <title></title>
+
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" media="screen" href="https://fonts.cdnfonts.com/css/clear-sans" type="text/css"/>
+    <!-- import the webpage's javascript file -->
+  </head>
+  <body>
+    <!-- this is the start of content -->
+    <h1>Umamusume Audio Player</h1>
+    <input type="text" id="vol" placeholder="Volume" value="0.15">
+    <a id="button" style="background:blue;visibility:hidden">Play</a>
+    <a id="vbutton" style="background:orange">Set Volume</a>
+    <a id="fbutton" style="background:red">Favorites Only</a>
+    <h2 id="txt"></h2>
+    <h1></h1>
+    <div id="songstable">
+      <h2>Songs</h2>
+    </div>
+    <audio id="player"></audio>
+  </body>
+  <script>
+    function $(x) { return document.getElementById(x) };
+    let songs = [
+      "Ambitious World (1)", 
+      "Ambitious World (Beyond The Promise Ver.)",
+      "BLOW my GALE",
+      "BoC-izm",
+      "DRAMATIC JOURNEY",
+      "ENDLESS DREAM!! (2021 Remastered Version)",
+      "Exercise the Right", 
+      "GIRLS' LEGEND U (1)",
+      "Glorious Moment",
+      "GSK",
+      "L'Arc de gloire",
+      "Legend-Changer [U1GgdidkyJA]",
+      "Make debut! (2021 Remastered Version)",
+      "MileRule Star",
+      "Ms. VICTORIA",
+      "Never Looking Back",
+      "Over a Tiara",
+      "Overrunner!",
+      "Ready!! Steady!! Derby!!",
+      "RUNRUN",
+      "Special Record! (2021 Remastered Version)",
+      "STARTING FORCE",
+      "U.M.A. NEW WORLD__ [gPttiXLNNYA]",
+      "UMA Summer",
+      "Umamusume OP ソシテミンナノ",
+      "UNLIMITED IMPACT",
+      "WE ARE DREAMERS!!",
+      "WINnin' 5 -ウイニングファイヴ- (1)",
+      "どどっと優勝！大感謝祭！！！ [WMz5cyeU0Zk]",
+      "はじまりのSignal (1)",
+      "ぴょいっとはれるや",
+      "めにしゅきラッシュっしゅ (1)",
+      "ゆるパカHAPPY DAYS",
+      "アコガレChallenge Dash!!",
+      "ウマすぎグルメパレード",
+      "グロウアップシャイン (2021 Remastered Version)",
+      "トレセン音頭",
+      "ユメヲカケル",
+      "ユースフルアイズ",
+      "夢疾風",
+      "奇跡を信じて (2021 Remastered Version)",
+      "彩 Phantasia",
+      "涙ひかって明日になれ",
+      "灰のmemoire [2m5eaJ9OCek]",
+      "爆熱マイソウル",
+      "立ち位置ゼロ番順位は一番",
+      "笑顔の宝物 -Beyond The Future!-",
+    ];
+    let lessFavorite = [
+      "DRAMATIC JOURNEY",
+      "Exercise the Right",
+      "Legend-Changer [U1GgdidkyJA]",
+      "Never Looking Back",
+      "Over a Tiara",
+      "Overrunner!",
+      "Special Record! (2021 Remastered Version)",
+      "U.M.A. NEW WORLD__ [gPttiXLNNYA]",
+      "UMA Summer",
+      "どどっと優勝！大感謝祭！！！ [WMz5cyeU0Zk]",
+      "ぴょいっとはれるや",
+      "ゆるパカHAPPY DAYS",
+      "ユースフルアイズ",
+      "涙ひかって明日になれ",
+      "灰のmemoire [2m5eaJ9OCek]",
+      "爆熱マイソウル",
+    ];
+    let queue = [...songs];
+    let queueIndex = 0;
+    let loaded = 0;
+    let player = $("player");
+    
+    //Preloading
+    function preload(url) {
+      let audio = new Audio();
+      audio.src = `/${url}.mp3`;
+      audio.addEventListener('canplaythrough', function() {
+        loaded++;
+        $("txt").innerHTML = `Loaded: ${loaded}/${songs.length}`;
+        if (loaded === songs.length) {
+          $("button").style.visibility = "visible";
+        };
+      }, {once: true});
+    };
+    for (let i = 0; i < songs.length; i++) preload(songs[i]);
+    
+    //Filtering
+    for (let s of songs) {
+      let a = document.createElement("a");
+      a.style.background = "blue";
+      a.class = s;
+      a.innerHTML = s;
+      a.onclick = function() {
+        if (songs.indexOf(s) > -1) {
+          songs.splice(songs.indexOf(s), 1);
+          a.style.background = "red";
+        } else {
+          songs.push(s);
+          a.style.background = "blue";
+        };
+      };
+      $("songstable").appendChild(a)
+    };
+    //Playing
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      };
+      return arr;
+    };
+    function playRandomSong() {
+      if (queueIndex >= queue.length) queueIndex = 0;
+      player.src = songs[songs.indexOf(queue[queueIndex])] + ".mp3";
+      player.volume = +$("vol").value;
+      player.play();
+      $("txt").innerHTML = "Playing: " + songs[songs.indexOf(queue[queueIndex])];
+    };
+    $("button").onclick = function() {
+      queue = [...songs];
+      shuffle(queue);
+      queueIndex = 0;
+      playRandomSong();
+    };
+    $("vbutton").onclick = function() {
+      player.volume = +$("vol").value;
+    };
+    $("fbutton").onclick = function() {
+      for (let ls of lessFavorite) songs.splice(songs.indexOf(ls), 1);
+      $("txt").innerHTML = `Loaded: ${loaded}/${songs.length}`;
+    };
+    player.addEventListener("ended", playRandomSong);
+  </script>
+</html>
