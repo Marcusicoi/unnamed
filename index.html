@@ -8,7 +8,7 @@
     <title></title>
 
     <!-- import the webpage's stylesheet -->
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="https://marcusicoi.github.io/unnamed/style.css" />
     <link rel="stylesheet" media="screen" href="https://fonts.cdnfonts.com/css/clear-sans" type="text/css"/>
     <!-- import the webpage's javascript file -->
   </head>
@@ -130,7 +130,7 @@
     //Preloading
     function preload(url) {
       let audio = new Audio();
-      audio.src = `/${url}.mp3`;
+      audio.src = `https://marcusicoi.github.io/unnamed/${url}.mp3`;
       audio.addEventListener('canplaythrough', function() {
         loaded++;
         $("txt").innerHTML = `Loaded: ${loaded}/${originalSongs.length}`;
@@ -143,7 +143,7 @@
     
     function preloadSFX(url) {
       let audio = new Audio();
-      audio.src = `/${url}.mp3`;
+      audio.src = `https://marcusicoi.github.io/unnamed/${url}.mp3`;
       audio.addEventListener('canplaythrough', function() {
         loadedsfx++;
         $("sfxtxt").innerHTML = `Loaded: ${loadedsfx}/${sfxs.length}`;
@@ -174,7 +174,7 @@
             p.className = "playersfxs";
             p.id = selectedSFX[selectedSFX.indexOf(s)] + "playersfx" + a;
             p.volume = a;
-            p.src = s + ".mp3";
+            p.src = "https://marcusicoi.github.io/unnamed/" + s + ".mp3";
             $("player").parentNode.insertBefore(p, $("player").nextSibling);
           };
         };
@@ -218,7 +218,7 @@
     function playRandomSong() {
       queueIndex++;
       if (queueIndex >= queue.length) queueIndex = 0;
-      player.src = songs[songs.indexOf(queue[queueIndex])] + ".mp3";
+      player.src = "https://marcusicoi.github.io/unnamed/" + songs[songs.indexOf(queue[queueIndex])] + ".mp3";
       player.volume = +$("vol").value;
       player.play();
       $("txt").innerHTML = "Playing: " + songs[songs.indexOf(queue[queueIndex])];
