@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="https://marcusicoi.glitch.me/icon.png" />
+
+    <title></title>
+
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" media="screen" href="https://fonts.cdnfonts.com/css/clear-sans" type="text/css"/>
+    <!-- import the webpage's javascript file -->
+  </head>
+  <body>
+    <!-- this is the start of content -->
+    <h1>Umamusume Audio Player</h1>
+    <input type="text" id="vol" placeholder="Volume" value="0.1">
+    <a id="button" style="background:blue;visibility:hidden">Play</a>
+    <a id="vbutton" style="background:orange">Set Volume</a>
+    <a id="fbutton" style="background:red">Favorites Only</a>
+    <h2 id="txt"></h2>
+    <h1></h1>
+    <div id="songstable">
+      <h2>Songs</h2>
+    </div>
+    <h1></h1>
+    <h2>SFX</h2>
+    <input type="text" id="sfxchance" placeholder="Chance">
+    <input type="text" id="sfxvolume" placeholder="Volume Splits">
+    <a id="sfxbutton" style="background:blue;visibility:hidden">Play</a>
+    <a id="sfxcbutton" style="background:orange">Set Changes</a>
+    <a id="sfxdbutton" style="background:black">Remove All SFX Auduo</a>
+    <h2 id="sfxtxt"></h2>
+    <h2 id="sfxcounter"></h2>
+    <div id="sfxtable">
+      <h2>SFXs</h2>
+    </div>
+    <audio id="player"></audio>
+  </body>
+  <script>
+    function $(x) { return document.getElementById(x) };
+    let originalSongs = [
+      "Ambitious World (1)", 
+      "Ambitious World (Beyond The Promise Ver.)",
+      "BLOW my GALE",
+      "BoC-izm",
+      "DRAMATIC JOURNEY",
+      "ENDLESS DREAM!! (2021 Remastered Version)",
+      "Exercise the Right", 
+      "Gaze on Me!",
+      "GIRLS' LEGEND U (1)",
+      "Glorious Moment",
+      "GSK",
+      "Koeru (Oguri CapTamamo Cross)",
+      "L'Arc de gloire",
+      "Legend-Changer [U1GgdidkyJA]",
+      "Make debut! (2021 Remastered Version)",
+      "MileRule Star",
+      "Ms. VICTORIA",
+      "Never Looking Back",
+      "Over a Tiara",
+      "Overrunner!",
+      "Ready!! Steady!! Derby!!",
+      "RUNRUN",
+      "Special Record! (2021 Remastered Version)",
+      "STARTING FORCE",
+      "U.M.A. NEW WORLD__ [gPttiXLNNYA]",
+      "UMA Summer",
+      "Umamusume OP ソシテミンナノ",
+      "UNLIMITED IMPACT",
+      "WE ARE DREAMERS!!",
+      "WINnin' 5 -ウイニングファイヴ- (1)",
+      "どどっと優勝！大感謝祭！！！ [WMz5cyeU0Zk]",
+      "はじまりのSignal (1)",
+      "ぴょいっとはれるや",
+      "めにしゅきラッシュっしゅ (1)",
+      "ゆるパカHAPPY DAYS",
+      "アコガレChallenge Dash!!",
+      "ウマすぎグルメパレード",
+      "グロウアップシャイン (2021 Remastered Version)",
+      "トレセン音頭",
+      "ユメヲカケル",
+      "ユースフルアイズ",
+      "光の後ろ姿",
+      "夢疾風",
+      "奇跡を信じて (2021 Remastered Version)",
+      "彩 Phantasia",
+      "涙ひかって明日になれ",
+      "灰のmemoire [2m5eaJ9OCek]",
+      "爆熱マイソウル",
+      "立ち位置ゼロ番順位は一番",
+      "笑顔の宝物 -Beyond The Future!-",
+    ];
+    let sfxs = [
+      "weiii-daitaku-helios",
+      "harikitte-ikou",
+    ];
+    let songs = [...originalSongs];
+    let selectedSFX = [];
+    let lessFavorite = [
+      "DRAMATIC JOURNEY",
+      "Exercise the Right",
+      "Legend-Changer [U1GgdidkyJA]",
+      "Never Looking Back",
+      "Over a Tiara",
+      "Overrunner!",
+      "Special Record! (2021 Remastered Version)",
+      "U.M.A. NEW WORLD__ [gPttiXLNNYA]",
+      "UMA Summer",
+      "どどっと優勝！大感謝祭！！！ [WMz5cyeU0Zk]",
+      "ぴょいっとはれるや",
+      "ゆるパカHAPPY DAYS",
+      "ユースフルアイズ",
+      "涙ひかって明日になれ",
+      "灰のmemoire [2m5eaJ9OCek]",
+      "爆熱マイソウル",
+    ];
+    let queue = [...songs];
+    let queueIndex = 0;
+    let loaded = 0;
+    let loadedsfx = 0;
+    let player = $("player");
+    let playersfx = (i, v) => { return $(i + "playersfx" + v) };
+    let sfxchance = 0;
+    let sfxintervals = {};
+    let sfxactive = false;
+    let sfxvolumes = [1];
+    let sfxcounter = {};
+    //Preloading
+    function preload(url) {
+      let audio = new Audio();
+      audio.src = `/${url}.mp3`;
+      audio.addEventListener('canplaythrough', function() {
+        loaded++;
+        $("txt").innerHTML = `Loaded: ${loaded}/${originalSongs.length}`;
+        if (loaded === originalSongs.length) {
+          $("button").style.visibility = "visible";
+        };
+      }, {once: true});
+    };
+    for (let i = 0; i < originalSongs.length; i++) preload(originalSongs[i]);
+    
+    function preloadSFX(url) {
+      let audio = new Audio();
+      audio.src = `/${url}.mp3`;
+      audio.addEventListener('canplaythrough', function() {
+        loadedsfx++;
+        $("sfxtxt").innerHTML = `Loaded: ${loadedsfx}/${sfxs.length}`;
+        if (loadedsfx === sfxs.length) {
+          $("sfxbutton").style.visibility = "visible";
+        };
+      }, {once: true});
+    };
+    for (let i = 0; i < sfxs.length; i++) preloadSFX(sfxs[i]);
+    
+    //Filtering
+    for (let s of sfxs) {
+      let a = document.createElement("a");
+      a.style.background = "green";
+      a.className = "sfxs";
+      a.innerHTML = s;
+      a.onclick = function() {
+        if (selectedSFX.indexOf(s) > -1) {
+          selectedSFX.splice(selectedSFX.indexOf(s), 1);
+          delete sfxcounter[s];
+          a.style.background = "green";
+        } else {
+          a.style.background = "lime";
+          selectedSFX.push(s);
+          sfxcounter[s] = 0;
+          for (let a of sfxvolumes) {
+            let p = document.createElement("audio");
+            p.className = "playersfxs";
+            p.id = selectedSFX[selectedSFX.indexOf(s)] + "playersfx" + a;
+            p.volume = a;
+            p.src = s + ".mp3";
+            $("player").parentNode.insertBefore(p, $("player").nextSibling);
+          };
+        };
+        $("sfxtxt").innerHTML = `Selected SFX: ${selectedSFX.join(", ")}`;
+        setSFXCounter();
+      };
+      $("sfxtable").appendChild(a);
+    };
+    for (let s of originalSongs) {
+      let a = document.createElement("a");
+      a.style.background = "blue";
+      a.className = "songs";
+      a.innerHTML = s;
+      a.onclick = function() {
+        if (songs.indexOf(s) > -1) {
+          songs.splice(songs.indexOf(s), 1);
+          a.style.background = "red";
+          $("txt").innerHTML = `Loaded: ${loaded}/${songs.length}`;
+        } else {
+          songs.push(s);
+          a.style.background = "blue";
+          $("txt").innerHTML = `Loaded: ${loaded}/${songs.length}`;
+        };
+      };
+      $("songstable").appendChild(a);
+    };
+    
+    //Playing
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      };
+      return arr;
+    };
+    function setSFXCounter() {
+      let str = "";
+      for (let i = 0; i < selectedSFX.length; i++) str += `${selectedSFX[i]} played ${sfxcounter[selectedSFX[i]]} times<br>`;
+      $("sfxcounter").innerHTML = str;
+    };
+    function playRandomSong() {
+      queueIndex++;
+      if (queueIndex >= queue.length) queueIndex = 0;
+      player.src = songs[songs.indexOf(queue[queueIndex])] + ".mp3";
+      player.volume = +$("vol").value;
+      player.play();
+      $("txt").innerHTML = "Playing: " + songs[songs.indexOf(queue[queueIndex])];
+    };
+    $("button").onclick = function() {
+      queue = [...songs];
+      shuffle(queue);
+      queueIndex = -1;
+      playRandomSong();
+    };
+    $("sfxbutton").onclick = function() {
+      if (sfxactive) {
+        sfxactive = false;
+        $("sfxtable").style.visibility = "visible";
+        $("sfxbutton").style.background = "blue";
+        $("sfxbutton").innerHTML = "Play";
+        for (let sfx = 0; sfx < selectedSFX.length; sfx++) for (let interval of sfxintervals[sfx]) clearInterval(interval);
+      } else {
+        sfxactive = true;
+        $("sfxtable").style.visibility = "hidden";
+        $("sfxbutton").style.background = "red";
+        $("sfxbutton").innerHTML = "Stop";
+        for (let sfx of selectedSFX) {
+          sfxintervals[sfx] = [];
+          for (let int = 0; int < sfxvolumes.length; int++) {
+            sfxintervals[sfx][int] = setInterval(function() {
+              if ((Math.random() * 100) < sfxchance) {
+                sfxcounter[sfx]++;
+                setSFXCounter();
+                playersfx(sfx, sfxvolumes[int]).play();
+              };
+            }, 100);
+          };
+        };
+      };
+    };
+    $("vbutton").onclick = function() {
+      player.volume = +$("vol").value;
+    };
+    $("sfxcbutton").onclick = function() {
+      sfxchance = +$("sfxchance").value;
+      
+      let minvolume = 0.1;
+      if (+$("sfxvolume").value === 0) sfxvolumes = [1];
+      else sfxvolumes = Array.from({length: +$("sfxvolume").value + 2}, (_, i) => minvolume + (1 - minvolume) * i / (+$("sfxvolume").value + 1));
+    };
+    $("sfxdbutton").onclick = function() {
+      for (let a of document.getElementsByClassName("playersfxs")) a.remove();
+    };
+    $("fbutton").onclick = function() {
+      for (let ls of lessFavorite) document.getElementsByClassName("songs")[originalSongs.indexOf(ls)].click();
+      $("txt").innerHTML = `Loaded: ${loaded}/${songs.length}`;
+    };
+    player.addEventListener("ended", playRandomSong);
+  </script>
+</html>
