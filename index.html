@@ -17,6 +17,7 @@
     <h1>Umamusume Audio Player</h1>
     <input type="text" id="vol" placeholder="Volume" value="0.1">
     <a id="button" style="background:blue;visibility:hidden">Play</a>
+    <a id="sbutton" style="background:yellow;visibility:hidden">Skip</a>
     <a id="vbutton" style="background:orange">Set Volume</a>
     <a id="fbutton" style="background:red">Favorites Only</a>
     <h2 id="txt"></h2>
@@ -229,6 +230,11 @@
       queue = [...songs];
       shuffle(queue);
       queueIndex = -1;
+      playRandomSong();
+      $("sbutton").style.visibility = "visible";
+    };
+    $("sbutton").onclick = function() {
+      queueIndex++;
       playRandomSong();
     };
     $("sfxbutton").onclick = function() {
