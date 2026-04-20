@@ -17,6 +17,7 @@
     <h1>Umamusume Audio Player</h1>
     <input type="text" id="vol" placeholder="Volume" value="0.1">
     <a id="button" style="background:blue;visibility:hidden">Play</a>
+    <a id="pbutton" style="background:magenta;visibility:hidden">Previous</a>
     <a id="sbutton" style="background:yellow;visibility:hidden">Skip</a>
     <a id="vbutton" style="background:orange">Set Volume</a>
     <a id="fbutton" style="background:red">Favorites Only</a>
@@ -229,8 +230,14 @@
       playRandomSong();
       $("sbutton").style.visibility = "visible";
     };
+    $("pbutton").onclick = function() {
+      queueIndex--;
+      if (queueIndex < 0) queueIndex = 0;
+      playRandomSong();
+    };
     $("sbutton").onclick = function() {
       queueIndex++;
+      if (queueIndex >= queue.length) queueIndex = 0;
       playRandomSong();
     };
     $("sfxbutton").onclick = function() {
