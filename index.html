@@ -199,11 +199,12 @@
           $("txt").innerHTML = `Loaded: ${loaded}/${songs.length}`;
         };
       };
-      a.oncontextmenu = function() {
+      a.oncontextmenu = function(e) {
         player.src = "https://marcusicoi.github.io/unnamed/" + s + ".mp3";
         player.volume = +$("vol").value;
         player.play();
         $("txt").innerHTML = "Playing: " + s;
+        e.preventDefault();
       };
       $("songstable").appendChild(a);
     };
